@@ -3,8 +3,6 @@ import sys
 import torch
 from transformers import DebertaV2Model, DebertaV2Tokenizer
 
-from config import config
-
 
 LOCAL_PATH = "./bert/deberta-v3-large"
 
@@ -16,7 +14,7 @@ models = dict()
 def get_bert_feature(
     text,
     word2ph,
-    device=config.bert_gen_config.device,
+    device="cuda",
     style_text=None,
     style_weight=0.7,
 ):

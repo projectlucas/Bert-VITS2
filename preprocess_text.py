@@ -7,29 +7,26 @@ import os
 from tqdm import tqdm
 import click
 from text.cleaner import clean_text
-from config import config
 from infer import latest_version
-
-preprocess_text_config = config.preprocess_text_config
 
 
 @click.command()
 @click.option(
     "--transcription-path",
-    default=preprocess_text_config.transcription_path,
+    default="filelists/你的数据集文本.list",
     type=click.Path(exists=True, file_okay=True, dir_okay=False),
 )
-@click.option("--cleaned-path", default=preprocess_text_config.cleaned_path)
-@click.option("--train-path", default=preprocess_text_config.train_path)
-@click.option("--val-path", default=preprocess_text_config.val_path)
+@click.option("--cleaned-path", default="")
+@click.option("--train-path", default="filelists/train.list")
+@click.option("--val-path", default="filelists/val.list")
 @click.option(
     "--config-path",
-    default=preprocess_text_config.config_path,
+    default="config.json",
     type=click.Path(exists=True, file_okay=True, dir_okay=False),
 )
-@click.option("--val-per-lang", default=preprocess_text_config.val_per_lang)
-@click.option("--max-val-total", default=preprocess_text_config.max_val_total)
-@click.option("--clean/--no-clean", default=preprocess_text_config.clean)
+@click.option("--val-per-lang", default=4)
+@click.option("--max-val-total", default=12)
+@click.option("--clean/--no-clean", default=true)
 @click.option("-y", "--yml_config")
 def preprocess(
     transcription_path: str,

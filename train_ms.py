@@ -10,7 +10,6 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 from torch.cuda.amp import autocast, GradScaler
 from tqdm import tqdm
 import logging
-from config import config
 import argparse
 import datetime
 
@@ -54,7 +53,13 @@ global_step = 0
 
 def run():
     # 环境变量解析
-    envs = config.train_ms_config.env
+    envs = {
+        "MASTER_ADD": "localhost",
+        "MASTER_PORT": 10086,
+        "WORLD_SIZE": 1,
+        "LOCAL_RANK": 0,
+        "RANK": 0
+    }
     for env_name, env_value in envs.items():
         if env_name not in os.environ.keys():
             print("加载config中的配置{}".format(str(env_value)))
@@ -85,11 +90,12 @@ def run():
     # hps = utils.get_hparams()
     parser = argparse.ArgumentParser()
     # 非必要不建议使用命令行配置，请使用config.yml文件
+    config_path = "config.json"
     parser.add_argument(
         "-c",
         "--config",
         type=str,
-        default=config.train_ms_config.config_path,
+        default=config_path,
         help="JSON file for configuration",
     )
 
@@ -98,21 +104,19 @@ def run():
         "--model",
         type=str,
         help="数据集文件夹路径，请注意，数据不再默认放在/logs文件夹下。如果需要用命令行配置，请声明相对于根目录的路径",
-        default=config.dataset_path,
+        default="Data/",
     )
     args = parser.parse_args()
-    model_dir = os.path.join(args.model, config.train_ms_config.model)
+    model_dir = os.path.join(args.model, "models")
     if not os.path.exists(model_dir):
         os.makedirs(model_dir)
     hps = utils.get_hparams_from_file(args.config)
     hps.model_dir = model_dir
     # 比较路径是否相同
-    if os.path.realpath(args.config) != os.path.realpath(
-        config.train_ms_config.config_path
-    ):
+    if os.path.realpath(args.config) != os.path.realpath(config_path):
         with open(args.config, "r", encoding="utf-8") as f:
             data = f.read()
-        with open(config.train_ms_config.config_path, "w", encoding="utf-8") as f:
+        with open(config_path, "w", encoding="utf-8") as f:
             f.write(data)
 
     torch.manual_seed(hps.train.seed)
@@ -137,7 +141,7 @@ def run():
     collate_fn = TextAudioSpeakerCollate()
     train_loader = DataLoader(
         train_dataset,
-        num_workers=min(config.train_ms_config.num_workers, os.cpu_count() - 1),
+        num_workers=min(16, os.cpu_count() - 1),
         shuffle=False,
         pin_memory=True,
         collate_fn=collate_fn,
@@ -263,13 +267,13 @@ def run():
         net_wd = DDP(net_wd, device_ids=[local_rank], bucket_cap_mb=512)
 
     # 下载底模
-    if config.train_ms_config.base["use_base_model"]:
-        utils.download_checkpoint(
-            hps.model_dir,
-            config.train_ms_config.base,
-            token=config.openi_token,
-            mirror=config.mirror,
-        )
+    # if config.train_ms_config.base["use_base_model"]:
+    #     utils.download_checkpoint(
+    #         hps.model_dir,
+    #         config.train_ms_config.base,
+    #         token=config.openi_token,
+    #         mirror=config.mirror,
+    #     )
     dur_resume_lr = hps.train.learning_rate
     wd_resume_lr = hps.train.learning_rate
     if net_dur_disc is not None:
@@ -727,7 +731,7 @@ def train_and_evaluate(
                         epoch,
                         os.path.join(hps.model_dir, "WD_{}.pth".format(global_step)),
                     )
-                keep_ckpts = config.train_ms_config.keep_ckpts
+                keep_ckpts = 8
                 if keep_ckpts > 0:
                     utils.clean_checkpoints(
                         path_to_models=hps.model_dir,

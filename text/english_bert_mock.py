@@ -3,8 +3,6 @@ import sys
 import torch
 from transformers import DebertaV2Model, DebertaV2Tokenizer
 
-from config import config
-
 
 LOCAL_PATH = "./bert/deberta-v3-large"
 
@@ -16,7 +14,7 @@ models = dict()
 def get_bert_feature(
     text,
     word2ph,
-    device=config.bert_gen_config.device,
+    device="cuda",
     style_text=None,
     style_weight=0.7,
 ):
@@ -29,12 +27,13 @@ def get_bert_feature(
     if not device:
         device = "cuda"
     if device not in models.keys():
-        if config.webui_config.fp16_run:
-            models[device] = DebertaV2Model.from_pretrained(
-                LOCAL_PATH, torch_dtype=torch.float16
-            ).to(device)
-        else:
-            models[device] = DebertaV2Model.from_pretrained(LOCAL_PATH).to(device)
+        # if config.webui_config.fp16_run:
+        #     models[device] = DebertaV2Model.from_pretrained(
+        #         LOCAL_PATH, torch_dtype=torch.float16
+        #     ).to(device)
+        # else:
+        #     models[device] = DebertaV2Model.from_pretrained(LOCAL_PATH).to(device)
+        models[device] = DebertaV2Model.from_pretrained(LOCAL_PATH).to(device)
     with torch.no_grad():
         inputs = tokenizer(text, return_tensors="pt")
         for i in inputs:

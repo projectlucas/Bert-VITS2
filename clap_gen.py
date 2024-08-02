@@ -6,7 +6,6 @@ import torch.multiprocessing as mp
 from tqdm import tqdm
 
 import utils
-from config import config
 from clap_wrapper import get_clap_audio_feature
 import librosa
 import os
@@ -17,15 +16,15 @@ torch.set_num_threads(1)
 
 
 def process_line(line):
-    device = config.emo_gen_config.device
-    if config.emo_gen_config.use_multi_device:
-        rank = mp.current_process()._identity
-        rank = rank[0] if len(rank) > 0 else 0
-        if torch.cuda.is_available():
-            gpu_id = rank % torch.cuda.device_count()
-            device = torch.device(f"cuda:{gpu_id}")
-        else:
-            device = torch.device("cpu")
+    device = "cuda"
+    # if config.emo_gen_config.use_multi_device:
+    #     rank = mp.current_process()._identity
+    #     rank = rank[0] if len(rank) > 0 else 0
+    #     if torch.cuda.is_available():
+    #         gpu_id = rank % torch.cuda.device_count()
+    #         device = torch.device(f"cuda:{gpu_id}")
+    #     else:
+    #         device = torch.device("cpu")
     wav_path, _, language_str, text, phones, tone, word2ph = line.strip().split("|")
 
     clap_path = wav_path.replace(".WAV", ".wav").replace(".wav", ".emo.pt")
@@ -42,10 +41,10 @@ def process_line(line):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "-c", "--config", type=str, default=config.emo_gen_config.config_path
+        "-c", "--config", type=str, default="config.json"
     )
     parser.add_argument(
-        "--num_processes", type=int, default=config.emo_gen_config.num_processes
+        "--num_processes", type=int, default=4
     )
     args, _ = parser.parse_known_args()
     config_path = args.config

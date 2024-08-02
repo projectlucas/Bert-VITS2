@@ -3,7 +3,6 @@ import sys
 import torch
 from transformers import AutoModelForMaskedLM, AutoTokenizer
 
-from config import config
 from text.japanese import text2sep_kata
 
 LOCAL_PATH = "./bert/deberta-v2-large-japanese-char-wwm"
@@ -16,7 +15,7 @@ models = dict()
 def get_bert_feature(
     text,
     word2ph,
-    device=config.bert_gen_config.device,
+    device="cuda",
     style_text=None,
     style_weight=0.7,
 ):
@@ -32,10 +31,11 @@ def get_bert_feature(
     if not device:
         device = "cuda"
     if device not in models.keys():
-        if config.webui_config.fp16_run:
-            models[device] = AutoModelForMaskedLM.from_pretrained(LOCAL_PATH, torch_dtype=torch.float16).to(device)
-        else:
-            models[device] = AutoModelForMaskedLM.from_pretrained(LOCAL_PATH).to(device)
+        # if config.webui_config.fp16_run:
+        #     models[device] = AutoModelForMaskedLM.from_pretrained(LOCAL_PATH, torch_dtype=torch.float16).to(device)
+        # else:
+        #     models[device] = AutoModelForMaskedLM.from_pretrained(LOCAL_PATH).to(device)
+        models[device] = AutoModelForMaskedLM.from_pretrained(LOCAL_PATH).to(device)
     with torch.no_grad():
         inputs = tokenizer(text, return_tensors="pt")
         for i in inputs:

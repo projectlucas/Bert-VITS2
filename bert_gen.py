@@ -6,20 +6,19 @@ from tqdm import tqdm
 from text import cleaned_text_to_sequence, get_bert
 import argparse
 import torch.multiprocessing as mp
-from config import config
 
 
 def process_line(x):
     line, add_blank = x
-    device = config.bert_gen_config.device
-    if config.bert_gen_config.use_multi_device:
-        rank = mp.current_process()._identity
-        rank = rank[0] if len(rank) > 0 else 0
-        if torch.cuda.is_available():
-            gpu_id = rank % torch.cuda.device_count()
-            device = torch.device(f"cuda:{gpu_id}")
-        else:
-            device = torch.device("cpu")
+    device = 'cuda'
+    # if config.bert_gen_config.use_multi_device:
+    #     rank = mp.current_process()._identity
+    #     rank = rank[0] if len(rank) > 0 else 0
+    #     if torch.cuda.is_available():
+    #         gpu_id = rank % torch.cuda.device_count()
+    #         device = torch.device(f"cuda:{gpu_id}")
+    #     else:
+    #         device = torch.device("cpu")
     wav_path, _, language_str, text, phones, tone, word2ph = line.strip().split("|")
     phone = phones.split(" ")
     tone = [int(i) for i in tone.split(" ")]
@@ -41,15 +40,13 @@ def process_line(x):
     torch.save(bert, bert_path)
 
 
-preprocess_text_config = config.preprocess_text_config
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "-c", "--config", type=str, default=config.bert_gen_config.config_path
+        "-c", "--config", type=str, default="config.json"
     )
     parser.add_argument(
-        "--num_processes", type=int, default=config.bert_gen_config.num_processes
+        "--num_processes", type=int, default=4
     )
     args, _ = parser.parse_known_args()
     config_path = args.config

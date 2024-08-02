@@ -10,8 +10,6 @@ from transformers.models.wav2vec2.modeling_wav2vec2 import (
     Wav2Vec2PreTrainedModel,
 )
 
-from config import config
-
 
 class RegressionHead(nn.Module):
     r"""Classification head."""
@@ -75,7 +73,7 @@ class AudioDataset(Dataset):
         return torch.from_numpy(processed_data)
 
 
-device = config.emo_gen_config.device
+device = "cuda"
 model_name = "./emotional/wav2vec2-large-robust-12-ft-emotion-msp-dim"
 processor = Wav2Vec2Processor.from_pretrained(model_name)
 model = EmotionModel.from_pretrained(model_name).to(device)

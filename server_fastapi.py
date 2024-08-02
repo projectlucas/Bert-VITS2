@@ -28,9 +28,6 @@ from infer import infer, get_net_g, latest_version
 import tools.translate as trans
 from re_matching import cut_sent
 
-
-from config import config
-
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 
@@ -177,14 +174,20 @@ if __name__ == "__main__":
     loaded_models = Models()
     # 加载模型
     logger.info("开始加载模型")
-    models_info = config.server_config.models
-    for model_info in models_info:
-        loaded_models.init_model(
-            config_path=model_info["config"],
-            model_path=model_info["model"],
-            device=model_info["device"],
-            language=model_info["language"],
-        )
+    # models_info = config.server_config.models
+    # for model_info in models_info:
+    #     loaded_models.init_model(
+    #         config_path=model_info["config"],
+    #         model_path=model_info["model"],
+    #         device=model_info["device"],
+    #         language=model_info["language"],
+    #     )
+    loaded_models.init_model(
+        config_path="",
+        model_path="",
+        device="cuda",
+        language="ZH",
+    )
 
     @app.get("/")
     async def index():
@@ -672,9 +675,9 @@ if __name__ == "__main__":
         return FileResponse(path=path)
 
     logger.warning("本地服务，请勿将服务端口暴露于外网")
-    logger.info(f"api文档地址 http://127.0.0.1:{config.server_config.port}/docs")
+    logger.info(f"api文档地址 http://127.0.0.1:5000/docs")
     if os.path.isdir(StaticDir):
-        webbrowser.open(f"http://127.0.0.1:{config.server_config.port}")
+        webbrowser.open(f"http://127.0.0.1:5000")
     uvicorn.run(
-        app, port=config.server_config.port, host="0.0.0.0", log_level="warning"
+        app, port=5000, host="0.0.0.0", log_level="warning"
     )

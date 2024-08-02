@@ -1,4 +1,5 @@
 # flake8: noqa: E402
+import argparse
 import os
 import logging
 import re_matching
@@ -21,12 +22,11 @@ from infer import infer, latest_version, get_net_g, infer_multilang
 import gradio as gr
 import webbrowser
 import numpy as np
-from config import config
+from config import Config
 import librosa
 
 net_g = None
-
-device = config.webui_config.device
+device = "cuda"
 if device == "mps":
     os.environ["PYTORCH_ENABLE_MPS_FALLBACK"] = "1"
 
@@ -404,6 +404,11 @@ def gr_util(item):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-y", "--yml_config", type=str, default="config.yml")
+    args, _ = parser.parse_known_args()
+    config = Config(args.yml_config)
+
     if config.webui_config.debug:
         logger.info("Enable DEBUG-LEVEL log")
         logging.basicConfig(level=logging.DEBUG)

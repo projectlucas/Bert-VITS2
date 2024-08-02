@@ -31,15 +31,13 @@ def get_bert(norm_text, word2ph, language, device):
 def check_bert_models():
     import json
     from pathlib import Path
-
-    from config import config
     from .bert_utils import _check_bert
 
-    if config.mirror.lower() == "openi":
-        import openi
+    # if config.mirror.lower() == "openi":
+    #     import openi
 
-        kwargs = {"token": config.openi_token} if config.openi_token else {}
-        openi.login(**kwargs)
+    #     kwargs = {"token": config.openi_token} if config.openi_token else {}
+    #     openi.login(**kwargs)
 
     with open("./bert/bert_models.json", "r") as fp:
         models = json.load(fp)

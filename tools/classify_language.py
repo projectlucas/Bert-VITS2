@@ -1,13 +1,12 @@
 import regex as re
 
-try:
-    from config import config
-
-    LANGUAGE_IDENTIFICATION_LIBRARY = (
-        config.webui_config.language_identification_library
-    )
-except:
-    LANGUAGE_IDENTIFICATION_LIBRARY = "langid"
+# try:
+#     LANGUAGE_IDENTIFICATION_LIBRARY = (
+#         config.webui_config.language_identification_library
+#     )
+# except:
+#     LANGUAGE_IDENTIFICATION_LIBRARY = "langid"
+LANGUAGE_IDENTIFICATION_LIBRARY = "langid"
 
 module = LANGUAGE_IDENTIFICATION_LIBRARY.lower()
 

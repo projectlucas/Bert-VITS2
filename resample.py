@@ -6,8 +6,6 @@ from multiprocessing import Pool, cpu_count
 import soundfile
 from tqdm import tqdm
 
-from config import config
-
 
 def process(item):
     spkdir, wav_name, args = item
@@ -22,19 +20,19 @@ if __name__ == "__main__":
     parser.add_argument(
         "--sr",
         type=int,
-        default=config.resample_config.sampling_rate,
+        default=44100,
         help="sampling rate",
     )
     parser.add_argument(
         "--in_dir",
         type=str,
-        default=config.resample_config.in_dir,
+        default="audios/raw",
         help="path to source dir",
     )
     parser.add_argument(
         "--out_dir",
         type=str,
-        default=config.resample_config.out_dir,
+        default="audios/wavs",
         help="path to target dir",
     )
     parser.add_argument(
