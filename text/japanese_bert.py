@@ -5,9 +5,9 @@ from transformers import AutoModelForMaskedLM, AutoTokenizer
 
 from text.japanese import text2sep_kata
 
-LOCAL_PATH = "./bert/deberta-v2-large-japanese-char-wwm"
+MODEL_NAME = "ku-nlp/deberta-v2-large-japanese-char-wwm"
 
-tokenizer = AutoTokenizer.from_pretrained(LOCAL_PATH)
+tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 
 models = dict()
 
@@ -35,7 +35,7 @@ def get_bert_feature(
         #     models[device] = AutoModelForMaskedLM.from_pretrained(LOCAL_PATH, torch_dtype=torch.float16).to(device)
         # else:
         #     models[device] = AutoModelForMaskedLM.from_pretrained(LOCAL_PATH).to(device)
-        models[device] = AutoModelForMaskedLM.from_pretrained(LOCAL_PATH).to(device)
+        models[device] = AutoModelForMaskedLM.from_pretrained(MODEL_NAME).to(device)
     with torch.no_grad():
         inputs = tokenizer(text, return_tensors="pt")
         for i in inputs:
