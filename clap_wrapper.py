@@ -4,8 +4,8 @@ import torch
 from transformers import ClapModel, ClapProcessor
 
 models = dict()
-LOCAL_PATH = "./emotional/clap-htsat-fused"
-processor = ClapProcessor.from_pretrained(LOCAL_PATH)
+MODEL_NAME = "laion/clap-htsat-fused"
+processor = ClapProcessor.from_pretrained(MODEL_NAME)
 
 
 def get_clap_audio_feature(audio_data, device="cuda"):
@@ -24,7 +24,7 @@ def get_clap_audio_feature(audio_data, device="cuda"):
         #     ).to(device)
         # else:
         #     models[device] = ClapModel.from_pretrained(LOCAL_PATH).to(device)
-        models[device] = ClapModel.from_pretrained(LOCAL_PATH).to(device)
+        models[device] = ClapModel.from_pretrained(MODEL_NAME).to(device)
     with torch.no_grad():
         inputs = processor(
             audios=audio_data, return_tensors="pt", sampling_rate=48000
@@ -49,7 +49,7 @@ def get_clap_text_feature(text, device="cuda"):
         #     ).to(device)
         # else:
         #     models[device] = ClapModel.from_pretrained(LOCAL_PATH).to(device)
-        models[device] = ClapModel.from_pretrained(LOCAL_PATH).to(device)
+        models[device] = ClapModel.from_pretrained(MODEL_NAME).to(device)
     with torch.no_grad():
         inputs = processor(text=text, return_tensors="pt").to(device)
         emb = models[device].get_text_features(**inputs).float()

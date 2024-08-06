@@ -437,7 +437,7 @@ def handle_long(sep_phonemes: list[list[str]]) -> list[list[str]]:
     return sep_phonemes
 
 
-tokenizer = AutoTokenizer.from_pretrained("./bert/deberta-v2-large-japanese-char-wwm")
+tokenizer = AutoTokenizer.from_pretrained("ku-nlp/deberta-v2-large-japanese-char-wwm")
 
 
 def align_tones(
@@ -513,7 +513,7 @@ def kata2phoneme_list(text: str) -> list[str]:
 
 if __name__ == "__main__":
     tokenizer = AutoTokenizer.from_pretrained(
-        "./bert/deberta-v2-large-japanese-char-wwm"
+        "ku-nlp/deberta-v2-large-japanese-char-wwm"
     )
     text = "hello,こんにちは、世界ー~！……"
 
